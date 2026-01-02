@@ -10,6 +10,7 @@ import {
     Button,
     Box
 } from '@mui/material';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface AddHostDialogProps {
     open: boolean;
@@ -21,6 +22,8 @@ export function AddHostDialog({ open, onClose, onAdd }: AddHostDialogProps) {
     const [address, setAddress] = useState('');
     const [port, setPort] = useState('');
     const [loading, setLoading] = useState(false);
+
+
 
     const handleSubmit = async () => {
         try {

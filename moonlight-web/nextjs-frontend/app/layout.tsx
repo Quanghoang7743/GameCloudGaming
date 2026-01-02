@@ -6,6 +6,7 @@ import { darkTheme } from "./theme";
 import "./globals.css";
 import ThemeRegistry from "./ThemeRegistry";
 import CursorTrail from "@/components/cursorEffect/cursoreffect";
+import { AuthProvider } from "./context/AuthContext";
 
 export const metadata: Metadata = {
   title: "VixeX - Game Streaming",
@@ -27,10 +28,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry>
-          <CursorTrail />
-          {children}
-        </ThemeRegistry>
+        <AuthProvider>
+          <ThemeRegistry>
+            {/* <CursorTrail /> */}
+            {children}
+          </ThemeRegistry>
+        </AuthProvider>
       </body>
     </html>
   );

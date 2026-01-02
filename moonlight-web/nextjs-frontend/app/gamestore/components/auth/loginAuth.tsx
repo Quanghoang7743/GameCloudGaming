@@ -7,7 +7,7 @@ export default function LoginAuth() {
     const router = useRouter()
 
     const handleLogin = () => {
-        router.push("/authentication")
+        router.push("/login")
     }
     return (
         <>

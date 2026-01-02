@@ -8,8 +8,11 @@ import { AddHostDialog } from '@/components/host/AddHostDialog';
 import { Host } from '@/components/host/HostCard';
 import { api } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export default function HostsPage() {
+    const auth = useAuth()
+    const user = auth.user
     const router = useRouter();
     const [hosts, setHosts] = useState<Host[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,17 +67,9 @@ export default function HostsPage() {
 
     return (
         <Box>
-            <NavBar title="Moonlight Web" />
+            {/* <NavBar title="Moonlight Web" /> */}
 
             <Container maxWidth="xl" sx={{ py: 4 }}>
-                <Box sx={{ mb: 4 }}>
-                    <Typography variant="h4" gutterBottom>
-                        Your Hosts
-                    </Typography>
-                    <Typography color="text.secondary">
-                        Manage your streaming hosts and connect to games
-                    </Typography>
-                </Box>
 
                 <HostList
                     hosts={hosts}
@@ -86,12 +81,13 @@ export default function HostsPage() {
                     onPairHost={handlePairHost}
                 />
             </Container>
-
             <AddHostDialog
                 open={addDialogOpen}
                 onClose={() => setAddDialogOpen(false)}
                 onAdd={handleAddHostSubmit}
             />
+            {/* {user?.role === 'ADMIN' && (
+            )} */}
         </Box>
     );
 }

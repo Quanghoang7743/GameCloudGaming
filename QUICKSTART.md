@@ -53,3 +53,16 @@ You need **both** servers running:
 - **Frontend** (port 3000) - Next.js UI
 
 Open http://localhost:3000 in your browser to use the app.
+
+
+Install Rust 
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+load env variables
+source $HOME/.cargo/env
+
+Install rust nightly
+rustup toolchain install nightly
+
+set default to nightly
+rustup override set nightly
