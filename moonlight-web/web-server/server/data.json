@@ -1,0 +1,56 @@
+{
+  "version": "2",
+  "users": {
+    "1164165117": {
+      "role": "Admin",
+      "name": "quanghoang",
+      "password": {
+        "salt": "c8109d8f754c156174c5a5cf20029c32",
+        "hash": "5fb60bc1eab6320d55a51e8f9fc172b32158db11eb4dd787727b9c993966060d"
+      },
+      "client_unique_id": "quanghoang"
+    },
+    "2033224882": {
+      "role": "User",
+      "name": "quanghoang2004",
+      "password": null,
+      "client_unique_id": "quanghoang2004"
+    }
+  },
+  "hosts": {
+    "935280800": {
+      "owner": 1164165117,
+      "address": "192.168.1.26",
+      "http_port": 47989,
+      "pair_info": null,
+      "cache": {
+        "name": "DESKTOP-BVK3IVN",
+        "mac": null
+      }
+    },
+    "4065666560": {
+      "owner": 2033224882,
+      "address": "172.16.96.128",
+      "http_port": 47989,
+      "pair_info": {
+        "client_private_key": "-----BEGIN PRIVATE KEY-----\r\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC9Gvf+zgOMXO8m\r\nz573rZEAZRM+hxImho3j6hl4hfKb9WsxtWAlS7ompn42ksvPTbJbF3ywEAgtTxoB\r\n6A6pO7GD1fX260hJYqv2U6atnXbhyhdeCBIl9WIWJDLfaIqYt4pceDtGZULiTexy\r\nDQy70JOz6efVjPPB6Iv8tTgEiBCH8hFhasfNVdWjWzfPsUlna0hLp0JacRB7/A21\r\n/iAsBMCaEZ7UNVsKI/9/M9vhArdSNBBzP7eus4riv92iaCaIJQkufNqF6idXFU8o\r\nau1PVfJE2bFzLpJpS5k+Q0amGS3+hkpCE7kyn1adXdJY7yqRmG/6hElZvuxT+Lr3\r\n3deNueZXAgMBAAECggEAIpY0pn9iicEToosVvaIao7JY3zZQHQi+GeHer7r8AQdV\r\niD1urNOZY+lOq0eVDEDfLqbwkLkV7ceKb6/UQqKe2IiBGJy212k7H230Tcu/ixNt\r\ny655N0UWoAsV3OOfecgT/86jtL/fiEmNRdzaJ93BrgXJd7b0fFI+jEVOzhFeyKYu\r\nG3rmDsqNF+6i0RPn9Gxg/XFSuYHpTCEM+jb3RsuVDS6306otcoXMOviSjPChreN+\r\nhTvMKaEG1a7rEfb9YnIRRMMSBu10+Papg1EE05z7qLMD7OcFy1Zoo+zslDmgmN8d\r\nqGcErNEg2EXQpCzcODbCokHbB922A1lrtmJggS+y/QKBgQDz2fJqM703yYgp1B7j\r\nGqrdRxzOScu1IWESd5UgELovd9+PTD21QfMIO6CyBpekO4kgGgmQQcE/LRsKoau5\r\nlDqFU0sK0Jq7P0rX78Wi7oCblkcOQJ1EFmQn4LsRXYRYrA6ogsb6VlT3jhYu/Lx7\r\nQqidl/GMeqFLgz7E10iQ8dycUwKBgQDGhswbZhcuyv9dptpnvr1KgUWVP08RDQG1\r\nQr81p5SCZurzfc0Z8L5g0+FMhs+cnmwN1o/QffQcpOTvAT9RQPFCaQWFTJsrEnhT\r\nZ8qWjqCqYKWRcM3W1Rgd4grcmAl69YwtTnnMGExX6vKS1yb7s7j9c6jIeXtIZQMQ\r\n/QKxI1RtbQKBgDhQifJK1pTuntqCGUv7WaBWjul5E2lWNxPLuA26rzTNKzztr4aP\r\nn2+0TY0vho+wDB/0w2akONu9L/SJl535BHbL4JWzzTgXCtLJlcvl5p+H2gsJkwgp\r\nX6Hx/WGqRikwOwZhhVBE5cRx9N+PEHwqzcPvViJKI7vLqJBO43xNztPvAoGAVaU3\r\njqZnX++BZXSjCli2LttAGpf6Uz/KOdl2xf3qyqr9t1fRUNyUNQ+TRcFu9YE+2mVz\r\nG54K3wSgIx/lofcjXeQS1qPq2RUZxdmkA3m6hGY3Z1xD4OeDhPjMeMg6Zsph0/Xk\r\nA5GD9fXM+l5JWhL5vpXT/dCyx9OUFBMiwyqbtK0CgYEAtUa5K8Baqpvs+G6lf717\r\nxvW9MnPoKf40eUc+xy7Hm5T7XGr7GWj9TAeQbJrtVVR0KlpI/+zQEYompwW7iDyI\r\n81dMVCoLpPaBtgq1qFi2vMUj6fPUO1Rp0ooiW3CQxMeNolsNfWvLThMYjc6H8Qzu\r\nkpjPeKDMbX+TaTemrcH6bAw=\r\n-----END PRIVATE KEY-----\r\n",
+        "client_certificate": "-----BEGIN CERTIFICATE-----\r\nMIIDNzCCAh+gAwIBAgIBADANBgkqhkiG9w0BAQsFADBfMQswCQYDVQQGEwJVUzEL\r\nMAkGA1UECAwCQ0ExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xFTATBgNVBAoMDEV4\r\nYW1wbGUgQ29ycDEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjYwMTA0MTA1NTM5\r\nWhcNMjcwMTA0MTA1NTM5WjBfMQswCQYDVQQGEwJVUzELMAkGA1UECAwCQ0ExFjAU\r\nBgNVBAcMDVNhbiBGcmFuY2lzY28xFTATBgNVBAoMDEV4YW1wbGUgQ29ycDEUMBIG\r\nA1UEAwwLZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB\r\nAQC9Gvf+zgOMXO8mz573rZEAZRM+hxImho3j6hl4hfKb9WsxtWAlS7ompn42ksvP\r\nTbJbF3ywEAgtTxoB6A6pO7GD1fX260hJYqv2U6atnXbhyhdeCBIl9WIWJDLfaIqY\r\nt4pceDtGZULiTexyDQy70JOz6efVjPPB6Iv8tTgEiBCH8hFhasfNVdWjWzfPsUln\r\na0hLp0JacRB7/A21/iAsBMCaEZ7UNVsKI/9/M9vhArdSNBBzP7eus4riv92iaCaI\r\nJQkufNqF6idXFU8oau1PVfJE2bFzLpJpS5k+Q0amGS3+hkpCE7kyn1adXdJY7yqR\r\nmG/6hElZvuxT+Lr33deNueZXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAHNRwBc+\r\ns8RyTmov9dEI6Yiou5yOco+s1L4WA15hXAzlNz+pQCdLPbxEPbkpNWH14eosn7kK\r\ncfBAHUVXjUUSvYP98EtB5FfZa/2+t5CcYqA8TGwYDVeisCCs1ewRV98itLbAAevC\r\n69RB6RxLxVCxlim881dSP+nvGNWukpiafd/SkLySJ9YCLvFvvqmG61yWHEnZ9zxZ\r\nGPfoFNVuESFxq/qmvDswwaSrT9gZBWvKuc8+KHeIHF5RodYNIVdkxtk3jVx+QuU9\r\n97adz+gY7EQi5VBEJe6T/+LXE+K6RRsH9Cm0adeK9ELoLZA8jX6g/vv//5jv7R6B\r\nbWDMeRm4saJQmSk=\r\n-----END CERTIFICATE-----\r\n",
+        "server_certificate": "-----BEGIN CERTIFICATE-----\r\nMIIC0jCCAbqgAwIBAgIUdiKmKSCfzF8ZocqdFTJPd8Vd6c0wDQYJKoZIhvcNAQEL\r\nBQAwIzEhMB8GA1UEAwwYU3Vuc2hpbmUgR2FtZXN0cmVhbSBIb3N0MB4XDTI2MDEw\r\nNTAxNTIyMloXDTQ1MTIzMTAxNTIyMlowIzEhMB8GA1UEAwwYU3Vuc2hpbmUgR2Ft\r\nZXN0cmVhbSBIb3N0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkfsB\r\nnHSmV2Zq0R8OeRnE5yt5jrNP63GKvdRmTqU9ipWiqukC9BiUHScV8XjZ4TLSgc0M\r\nIXTT8cl8mxupUfsWRmvU5YiraM3yqPeZmN0u51E3zA9LF5o0ai5m+9N8GMiQstba\r\n5Y8SipAu8xiTKlvFQNkmehb4M6NWDb4QJiOUJUqC1GJLKhZJEZ2CgDED2pDLqymB\r\n42RnmUZPZjWplxGDNkHZzQEr7wx4x0Z85oIpJH6tBj6gNxda+yP52MMNwXYSEAot\r\nWgjF8j1UBaxhXx4gbYV5IIRZcwXlahVgi5PQoTKavUfRdEdVx7WBKDouWOxlPD7w\r\nctPIeSFtc8hRkKzILQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBe077vrLo0y+K9\r\niYWRA7kpkx5hFi/zbDfhHxaKHNyd3X/1yjIA8G2oYncTBaLTrQwLTi5uOEGEUOQH\r\no2ShXZBF/wU1VziE5pAs8aqK3wzxWQSwX3jlVnDkKVG7geRyC0+9jUJYyNUTx3su\r\nDKEYEuYoIhiu8eQcaEUp1P1gWdfqHzOBWcImnjY378Jqus2V0Mm/3Kx978yNNFy0\r\nwEnumWlZCjXQkdSYrsQ122KFAdFAwHf28AF0BKYmy3g7nRfz7kRko1ndkYXEnVaK\r\n4v/mA8xuSHVGVzYrZQ8fISvIqnsSmBimCwBYpgp+9jLCQm/ld0gFrasoPczL2PMQ\r\ng2lEeeVs\r\n-----END CERTIFICATE-----\r\n"
+      },
+      "cache": {
+        "name": "DESKTOP-DQS8HUQ",
+        "mac": "00:0c:29:45:ab:3d"
+      }
+    },
+    "1690596766": {
+      "owner": 2033224882,
+      "address": "192.168.1.26",
+      "http_port": 47989,
+      "pair_info": null,
+      "cache": {
+        "name": "DESKTOP-BVK3IVN",
+        "mac": null
+      }
+    }
+  }
+}

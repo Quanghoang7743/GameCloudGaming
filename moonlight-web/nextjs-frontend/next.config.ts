@@ -2,10 +2,9 @@
 const nextConfig = {
   async rewrites() {
     return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
-      },
+      // Auth routes go to Rust backend
+      // Note: We use Next.js API routes for /api/hosts and /api/host
+      // to bridge Python JWT auth with Rust host management
       {
         source: '/login',
         destination: 'http://localhost:8080/login',

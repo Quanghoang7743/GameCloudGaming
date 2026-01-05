@@ -120,6 +120,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/lib/api/router.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// Python backend handles authentication (JWT)
+// Next.js API routes will proxy host-related requests to Rust backend
 __turbopack_context__.s([
     "API_ROUTER",
     ()=>API_ROUTER
@@ -141,6 +143,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$router$2e$ts__
 ;
 ;
 const TOKEN_KEY = 'auth_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
 class AuthService {
     /**
      * Login user with username/email and password
@@ -154,9 +157,12 @@ class AuthService {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
-        // Store token in localStorage
+        // Store both tokens in localStorage
         if (response.data.access_token) {
             this.setToken(response.data.access_token);
+        }
+        if (response.data.refresh_token) {
+            this.setRefreshToken(response.data.refresh_token);
         }
         return response.data;
     }
@@ -177,25 +183,41 @@ class AuthService {
     /**
      * Refresh authentication token
      */ static async refreshToken() {
-        const token = this.getToken();
-        if (!token) {
-            throw new Error('No authentication token found');
+        const refreshToken = this.getRefreshToken();
+        if (!refreshToken) {
+            throw new Error('No refresh token found');
         }
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post(`${__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$router$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["API_ROUTER"]}/auth/refresh`, {}, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'X-Refresh-Token': refreshToken
             }
         });
-        // Update token in localStorage
+        // Update both tokens in localStorage
         if (response.data.access_token) {
             this.setToken(response.data.access_token);
+        }
+        if (response.data.refresh_token) {
+            this.setRefreshToken(response.data.refresh_token);
         }
         return response.data;
     }
     /**
-     * Logout user and clear token
-     */ static logout() {
+     * Logout user and clear tokens
+     */ static async logout() {
+        const refreshToken = this.getRefreshToken();
+        if (refreshToken) {
+            try {
+                await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post(`${__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$router$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["API_ROUTER"]}/auth/logout`, {}, {
+                    headers: {
+                        'X-Refresh-Token': refreshToken
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
         this.removeToken();
+        this.removeRefreshToken();
     }
     /**
      * Store authentication token
@@ -218,6 +240,29 @@ class AuthService {
      */ static removeToken() {
         if ("TURBOPACK compile-time truthy", 1) {
             localStorage.removeItem(TOKEN_KEY);
+        }
+    }
+    /**
+     * Store refresh token
+     */ static setRefreshToken(token) {
+        if ("TURBOPACK compile-time truthy", 1) {
+            localStorage.setItem(REFRESH_TOKEN_KEY, token);
+        }
+    }
+    /**
+     * Retrieve refresh token
+     */ static getRefreshToken() {
+        if ("TURBOPACK compile-time truthy", 1) {
+            return localStorage.getItem(REFRESH_TOKEN_KEY);
+        }
+        //TURBOPACK unreachable
+        ;
+    }
+    /**
+     * Remove refresh token
+     */ static removeRefreshToken() {
+        if ("TURBOPACK compile-time truthy", 1) {
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
         }
     }
     /**
@@ -297,9 +342,14 @@ function AuthProvider({ children }) {
             throw error;
         }
     };
-    const logout = ()=>{
-        __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthService"].logout();
-        setUser(null);
+    const logout = async ()=>{
+        try {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthService"].logout();
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally{
+            setUser(null);
+        }
     };
     const refreshUser = async ()=>{
         try {
@@ -308,8 +358,20 @@ function AuthProvider({ children }) {
                 setUser(userInfo);
             }
         } catch (error) {
-            console.error('Failed to refresh user info:', error);
-            logout();
+            // If 401, try to refresh token
+            if (error.response?.status === 401) {
+                try {
+                    await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthService"].refreshToken();
+                    const userInfo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthService"].getCurrentUser();
+                    setUser(userInfo);
+                } catch (refreshError) {
+                    console.error('Failed to refresh token:', refreshError);
+                    await logout();
+                }
+            } else {
+                console.error('Failed to refresh user info:', error);
+                await logout();
+            }
         }
     };
     const value = {
@@ -325,7 +387,7 @@ function AuthProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/app/context/AuthContext.tsx",
-        lineNumber: 80,
+        lineNumber: 97,
         columnNumber: 12
     }, this);
 }

@@ -5,6 +5,7 @@ import { Container, Typography, Box } from '@mui/material';
 import { NavBar } from '@/components/ui/NavBar';
 import { HostList } from '@/components/host/HostList';
 import { AddHostDialog } from '@/components/host/AddHostDialog';
+import { PairingDialog } from '@/components/hosts/PairingDialog';
 import { Host } from '@/components/host/HostCard';
 import { api } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
@@ -17,6 +18,8 @@ export default function HostsPage() {
     const [hosts, setHosts] = useState<Host[]>([]);
     const [loading, setLoading] = useState(true);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
+    const [pairingDialogOpen, setPairingDialogOpen] = useState(false);
+    const [pairingHost, setPairingHost] = useState<Host | null>(null);
 
     useEffect(() => {
         loadHosts();
@@ -27,9 +30,13 @@ export default function HostsPage() {
             setLoading(true);
             const data = await api.hosts.list();
             setHosts(data as any);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to load hosts:', error);
-            router.push('/login');
+            // Only redirect to login on authentication errors (401/403)
+            if (error.status === 401 || error.status === 403) {
+                router.push('/login');
+            }
+            // For other errors, just log them (could add toast notification here)
         } finally {
             setLoading(false);
         }
@@ -45,7 +52,7 @@ export default function HostsPage() {
     };
 
     const handleConnectHost = (host: Host) => {
-        router.push(`/games/${host.id}`);
+        router.push(`/games/${host.host_id}`);
     };
 
     const handleEditHost = (host: Host) => {
@@ -54,7 +61,7 @@ export default function HostsPage() {
 
     const handleDeleteHost = async (host: Host) => {
         try {
-            await api.hosts.delete(host.id);
+            await api.hosts.delete(host.host_id);
             loadHosts();
         } catch (error) {
             console.error('Failed to delete host:', error);
@@ -62,7 +69,12 @@ export default function HostsPage() {
     };
 
     const handlePairHost = (host: Host) => {
-        console.log('Pair host:', host);
+        setPairingHost(host);
+        setPairingDialogOpen(true);
+    };
+
+    const handlePairingSuccess = () => {
+        loadHosts(); // Reload to get updated pair status
     };
 
     return (
@@ -80,14 +92,23 @@ export default function HostsPage() {
                     onDeleteHost={handleDeleteHost}
                     onPairHost={handlePairHost}
                 />
+
+                <AddHostDialog
+                    open={addDialogOpen}
+                    onClose={() => setAddDialogOpen(false)}
+                    onAdd={handleAddHostSubmit}
+                />
+
+                {pairingHost && (
+                    <PairingDialog
+                        open={pairingDialogOpen}
+                        hostId={pairingHost.host_id}
+                        hostName={pairingHost.name}
+                        onClose={() => setPairingDialogOpen(false)}
+                        onSuccess={handlePairingSuccess}
+                    />
+                )}
             </Container>
-            <AddHostDialog
-                open={addDialogOpen}
-                onClose={() => setAddDialogOpen(false)}
-                onAdd={handleAddHostSubmit}
-            />
-            {/* {user?.role === 'ADMIN' && (
-            )} */}
         </Box>
     );
 }

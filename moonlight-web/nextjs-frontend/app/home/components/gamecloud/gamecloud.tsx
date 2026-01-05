@@ -1,6 +1,7 @@
 'use client'
 import { Button, keyframes, Typography } from '@mui/material'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 
@@ -10,6 +11,11 @@ export const GameCloud = () => {
       50% { transform: scale(1.5); opacity: 0.7; }
       100% { transform: scale(1); opacity: 1; }
     `;
+
+    const router = useRouter()
+    const handlePlayGame = () => {
+        router.push('/hosts')
+    }
     return (
         <>
             <Button sx={{
@@ -26,7 +32,9 @@ export const GameCloud = () => {
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
                 },
                 position: "relative",
-            }}>
+            }}
+                onClick={handlePlayGame}
+            >
                 <Typography component="span"
                     sx={{
                         display: "flex",

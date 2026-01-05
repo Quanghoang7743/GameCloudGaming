@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -50,7 +50,7 @@ def verify_token(token: str) -> dict:
         raise credentials_exception
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    request: Request,
     db: Session = Depends(get_db)
 ) -> User:
     
@@ -59,6 +59,12 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # Read token from cookie instead of Authorization header
+    token = request.cookies.get("access_token")
+    
+    if not token:
+        raise credentials_exception
     
     payload = verify_token(token)
     email: str = payload.get("sub")

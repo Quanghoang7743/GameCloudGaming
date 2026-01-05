@@ -6,10 +6,10 @@ export interface LoginCredentials {
     password: string;
 }
 
-export interface AuthResponse {
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
+export interface LoginResponse {
+    username: string;
+    email: string;
+    message: string;
 }
 
 export interface UserInfo {
@@ -20,185 +20,73 @@ export interface UserInfo {
     created_at: string;
 }
 
-const TOKEN_KEY = 'auth_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
+// Configure axios to send cookies with requests
+axios.defaults.withCredentials = true;
 
 export class AuthService {
-    /**
-     * Login user with username/email and password
-     */
-    static async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        // FastAPI OAuth2PasswordRequestForm expects application/x-www-form-urlencoded format
+    static async login(credentials: LoginCredentials): Promise<LoginResponse> {
         const formData = new URLSearchParams();
         formData.append('username', credentials.username);
         formData.append('password', credentials.password);
 
-        const response = await axios.post<AuthResponse>(
+        const response = await axios.post<LoginResponse>(
             `${API_ROUTER}/auth/login`,
             formData,
             {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
+                withCredentials: true,  // Include cookies
             }
         );
-
-        // Store both tokens in localStorage
-        if (response.data.access_token) {
-            this.setToken(response.data.access_token);
-        }
-        if (response.data.refresh_token) {
-            this.setRefreshToken(response.data.refresh_token);
-        }
 
         return response.data;
     }
 
-    /**
-     * Get current user information
-     */
     static async getCurrentUser(): Promise<UserInfo> {
-        const token = this.getToken();
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
         const response = await axios.get<UserInfo>(
             `${API_ROUTER}/auth/me`,
             {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+                withCredentials: true,  // Include cookies
             }
         );
 
         return response.data;
     }
 
-    /**
-     * Refresh authentication token
-     */
-    static async refreshToken(): Promise<AuthResponse> {
-        const refreshToken = this.getRefreshToken();
-        if (!refreshToken) {
-            throw new Error('No refresh token found');
-        }
-
-        const response = await axios.post<AuthResponse>(
+    static async refreshToken(): Promise<void> {
+        await axios.post(
             `${API_ROUTER}/auth/refresh`,
             {},
             {
-                headers: {
-                    'X-Refresh-Token': refreshToken,
-                },
+                withCredentials: true,  // Include cookies
             }
         );
-
-        // Update both tokens in localStorage
-        if (response.data.access_token) {
-            this.setToken(response.data.access_token);
-        }
-        if (response.data.refresh_token) {
-            this.setRefreshToken(response.data.refresh_token);
-        }
-
-        return response.data;
+        // New cookies set automatically by server
     }
 
-    /**
-     * Logout user and clear tokens
-     */
     static async logout(): Promise<void> {
-        const refreshToken = this.getRefreshToken();
-
-        if (refreshToken) {
-            try {
-                await axios.post(
-                    `${API_ROUTER}/auth/logout`,
-                    {},
-                    {
-                        headers: {
-                            'X-Refresh-Token': refreshToken,
-                        },
-                    }
-                );
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
+        try {
+            await axios.post(
+                `${API_ROUTER}/auth/logout`,
+                {},
+                {
+                    withCredentials: true,  // Include cookies
+                }
+            );
+        } catch (error) {
+            console.error('Logout error:', error);
         }
-
-        this.removeToken();
-        this.removeRefreshToken();
+        // Cookies cleared by server
     }
 
-    /**
-     * Store authentication token
-     */
-    static setToken(token: string): void {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem(TOKEN_KEY, token);
+
+    static async isAuthenticated(): Promise<boolean> {
+        try {
+            await this.getCurrentUser();
+            return true;
+        } catch {
+            return false;
         }
-    }
-
-    /**
-     * Retrieve authentication token
-     */
-    static getToken(): string | null {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem(TOKEN_KEY);
-        }
-        return null;
-    }
-
-    /**
-     * Remove authentication token
-     */
-    static removeToken(): void {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem(TOKEN_KEY);
-        }
-    }
-
-    /**
-     * Store refresh token
-     */
-    static setRefreshToken(token: string): void {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem(REFRESH_TOKEN_KEY, token);
-        }
-    }
-
-    /**
-     * Retrieve refresh token
-     */
-    static getRefreshToken(): string | null {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem(REFRESH_TOKEN_KEY);
-        }
-        return null;
-    }
-
-    /**
-     * Remove refresh token
-     */
-    static removeRefreshToken(): void {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem(REFRESH_TOKEN_KEY);
-        }
-    }
-
-    /**
-     * Check if user is authenticated
-     */
-    static isAuthenticated(): boolean {
-        return !!this.getToken();
-    }
-
-    /**
-     * Get authorization header for authenticated requests
-     */
-    static getAuthHeader(): { Authorization: string } | {} {
-        const token = this.getToken();
-        return token ? { Authorization: `Bearer ${token}` } : {};
     }
 }

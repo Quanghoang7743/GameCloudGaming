@@ -39,15 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = async (username: string, password: string) => {
         try {
-            const response = await AuthService.login({ username, password })
+            // Login sets cookies automatically
+            await AuthService.login({ username, password });
 
-            if (response.access_token) {
-                // Fetch user info after successful login
-                const userInfo = await AuthService.getCurrentUser()
-                setUser(userInfo)
-            }
+            // Fetch user info after successful login
+            const userInfo = await AuthService.getCurrentUser();
+            setUser(userInfo);
         } catch (error) {
-            throw error
+            throw error;
         }
     }
 

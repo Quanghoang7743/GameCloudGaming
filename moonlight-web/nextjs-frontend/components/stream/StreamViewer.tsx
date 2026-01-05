@@ -4,14 +4,14 @@ import { useRef, useEffect } from 'react';
 import { Box } from '@mui/material';
 
 interface StreamViewerProps {
-    videoRef: React.RefObject<HTMLVideoElement>;
+    videoRef: React.RefObject<HTMLVideoElement | null> | ((element: HTMLVideoElement | null) => void);
     onVideoClick?: () => void;
 }
 
 export function StreamViewer({ videoRef, onVideoClick }: StreamViewerProps) {
     useEffect(() => {
         // Request fullscreen on mobile devices
-        const video = videoRef.current;
+        const video = typeof videoRef === 'function' ? null : videoRef.current;
         if (video) {
             // Set video properties for optimal streaming
             video.playsInline = true;
@@ -31,7 +31,7 @@ export function StreamViewer({ videoRef, onVideoClick }: StreamViewerProps) {
             onClick={onVideoClick}
         >
             <video
-                ref={videoRef}
+                ref={videoRef as any}
                 autoPlay
                 playsInline
                 muted={false}

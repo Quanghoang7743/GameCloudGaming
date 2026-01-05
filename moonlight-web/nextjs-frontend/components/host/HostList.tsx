@@ -64,10 +64,10 @@ export function HostList({
 
     return (
         <Box>
-            <Grid container spacing={2}>
-                {hosts.map((host) => (
-                    // @ts-ignore
-                    <Grid item xs={12} sm={6} md={4} key={host.id}>
+            <Grid container spacing={3}>
+                {hosts.map((host, index) => (
+
+                    <Grid item xs={12} sm={6} md={4} key={host.host_id}>
                         <HostCard
                             host={host}
                             onConnect={onConnectHost}

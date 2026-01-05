@@ -22,15 +22,40 @@ export default function GamesPage() {
         try {
             setLoading(true);
 
+            // Validate hostId
+            if (!hostId || hostId === 'undefined') {
+                throw new Error('Invalid host ID');
+            }
 
-            // Mock data for now
-            setGames([
-                { id: 1, name: 'Steam', running: false },
-                { id: 2, name: 'Desktop', running: false },
-                { id: 3, name: 'Game 1', running: false },
-            ]);
+            // Fetch apps from API (cookies sent automatically)
+            const response = await fetch(`/api/host/apps?host_id=${hostId}`, {
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`[GamesPage] API Error (${response.status}):`, errorText);
+                throw new Error(`Failed to fetch apps: ${response.status} ${errorText}`);
+            }
+
+            const apps = await response.json();
+            console.log('[GamesPage] Fetched apps:', apps);
+
+            if (Array.isArray(apps)) {
+                // Transform API response to Game format if necessary, assuming 'apps' contains objects with app_id and title
+                const gamesList: Game[] = apps.map((app: any) => ({
+                    id: app.app_id,
+                    name: app.title,
+                    running: false, // Default to false, update if API provides this
+                }));
+                setGames(gamesList);
+            } else {
+                console.warn('[GamesPage] Apps is not an array:', apps);
+                setGames([]);
+            }
         } catch (error) {
             console.error('Failed to load games:', error);
+            setGames([]);
         } finally {
             setLoading(false);
         }

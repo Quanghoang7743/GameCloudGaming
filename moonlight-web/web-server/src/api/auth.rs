@@ -35,6 +35,29 @@ fn extract_user_auth(req: &HttpRequest) -> Result<UserAuth, AppError> {
         Some(value) => value,
     };
 
+    // First, check for query parameter token (for WebSocket auth)
+    if let Some(query_str) = req.uri().query() {
+        for param in query_str.split('&') {
+            if let Some((key, value)) = param.split_once('=') {
+                if key == "token" {
+                    // Got token from query param - verify with Python backend
+                    // Use tokio block_in_place since this is in sync context
+                    match tokio::task::block_in_place(|| {
+                        tokio::runtime::Handle::current().block_on(verify_python_token(value))
+                    }) {
+                        Ok(username) => {
+                            return Ok(UserAuth::ForwardedHeaders { username });
+                        }
+                        Err(e) => {
+                            eprintln!("[WebSocket Auth] Token verification failed: {:?}", e);
+                            return Err(AppError::Unauthorized);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if let Some(header_auth) = &app.config().web_server.forwarded_header
         && let Some(username) = req.headers().get(&header_auth.username_header)
     {
@@ -67,6 +90,29 @@ fn extract_user_auth(req: &HttpRequest) -> Result<UserAuth, AppError> {
     } else {
         Ok(UserAuth::None)
     }
+}
+
+// Verify JWT token with Python backend and extract username
+async fn verify_python_token(token: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("http://localhost:8001/auth/me")
+        .header("Cookie", format!("access_token={}", token))
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        return Err("Token verification failed".into());
+    }
+
+    let user_data: serde_json::Value = response.json().await?;
+    let username = user_data["username"]
+        .as_str()
+        .or(user_data["email"].as_str())
+        .ok_or("No username in response")?
+        .to_string();
+
+    Ok(username)
 }
 
 impl FromRequest for AuthenticatedUser {

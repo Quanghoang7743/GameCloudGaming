@@ -6,7 +6,7 @@ import { NavbarComponent } from '../navbar/navbar.component'
 import LoginAuth from '../auth/loginAuth'
 import { GameCloud } from '../gamecloud/gamecloud'
 import { useAuth } from '@/app/context/AuthContext'
-import { AvatarUser } from '@/app/(account)/(profile)/components/avatarUser/avataruser'
+import { AvatarUser } from '@/app/(account)/(setting)/components/avatarUser/avataruser'
 
 export default function HeaderComponent() {
     const auth = useAuth()

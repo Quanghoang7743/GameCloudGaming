@@ -42,9 +42,11 @@ fn default_builder() -> ClientBuilder {
         .timeout(DEFAULT_LONG_TIMEOUT)
         // https://github.com/seanmonstar/reqwest/issues/2021
         .pool_max_idle_per_host(0)
+        .danger_accept_invalid_certs(true)
 }
 fn timeout_builder() -> ClientBuilder {
-    default_builder().timeout(DEFAULT_TIMEOUT)
+    default_builder()
+        .timeout(DEFAULT_TIMEOUT)
 }
 
 fn build_url(

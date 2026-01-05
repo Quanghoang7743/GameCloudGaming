@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
-from fastapi import APIRouter, Depends, HTTPException, status, Header
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Header
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import secrets
 
@@ -18,8 +18,9 @@ router = APIRouter(
     tags=["authentication"]
 )
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -72,10 +73,30 @@ async def login(
     db.add(refresh_token_obj)
     db.commit()
     
+    # Set cookies instead of returning in body
+    # access_token: NOT httpOnly so JavaScript can read it for WebSocket URL
+    # refresh_token: httpOnly for security (not needed in client-side JS)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=False,  # Allow JS to read for WebSocket auth
+        secure=False,  # Set True in production with HTTPS
+        samesite="lax",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token_str,
+        httponly=True,  # Keep httpOnly for security
+        secure=False,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+    )
+    
     return {
-        "access_token": access_token,
-        "refresh_token": refresh_token_str,
-        "token_type": "bearer"
+        "username": user.username,
+        "email": user.email,
+        "message": "Login successful"
     }
 
 @router.get("/me", response_model=UserResponse)

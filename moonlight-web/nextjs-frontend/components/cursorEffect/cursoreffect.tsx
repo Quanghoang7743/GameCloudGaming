@@ -14,7 +14,7 @@ export default function CursorTrail() {
     // Dùng useRef để lưu trữ tham chiếu đến các phần tử DOM mà không gây re-render
     const circlesRef = useRef<(HTMLDivElement | null)[]>([]);
     const coords = useRef({ x: 0, y: 0 });
-    const requestRef = useRef<number>();
+    const requestRef = useRef<number>(0);
 
     useEffect(() => {
         // Khởi tạo vị trí ban đầu cho các phần tử
@@ -78,7 +78,7 @@ export default function CursorTrail() {
                 <Box
                     key={index}
                     ref={(el) => {
-                        circlesRef.current[index] = el;
+                        circlesRef.current[index] = el as HTMLDivElement | null;
                     }}
                     className="circle"
                     sx={{

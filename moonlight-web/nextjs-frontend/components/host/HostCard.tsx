@@ -9,21 +9,35 @@ import {
     Button,
     IconButton,
     Box,
-    Chip
+    Chip,
+    Badge,
+    Avatar,
+    Fade,
+    Tooltip,
+    Divider
 } from '@mui/material';
 import ComputerIcon from '@mui/icons-material/Computer';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+import PowerIcon from '@mui/icons-material/Power';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+
 
 export interface Host {
-    id: number;
+    host_id: number;  // API uses host_id, not id
     name: string;
     address: string;
     port?: number;
-    paired: boolean;
-    online?: boolean;
+    paired: string;   // API returns "Paired" or "Unpaired" as string
+    online: boolean;
+    owner?: string;
+    server_state?: string | null;
 }
+
+// Helper to check if paired
+export const isPaired = (host: Host) => host.paired === "Paired";
 
 interface HostCardProps {
     host: Host;
@@ -35,96 +49,100 @@ interface HostCardProps {
 
 export function HostCard({ host, onConnect, onEdit, onDelete, onPair }: HostCardProps) {
     const [isHovered, setIsHovered] = useState(false);
+    const statusColor = host.online ? 'success.main' : 'error.main';
+    const pairedStatus = isPaired(host);
 
     return (
         <Card
-            sx={{
-                minWidth: 275,
-                maxWidth: 400,
-                m: 2,
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 6,
-                }
-            }}
+            elevation={isHovered ? 8 : 1}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => onConnect?.(host)}
+            sx={{
+                width: 340,
+                m: 2,
+                borderRadius: 4,
+                position: 'relative',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                border: '1px solid',
+                borderColor: 'divider',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    borderColor: 'primary.main',
+                },
+                overflow: 'visible'
+            }}
         >
-            <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <ComputerIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h5" component="div">
-                            {host.name}
-                        </Typography>
-                        <Typography color="text.secondary" variant="body2">
-                            {host.address}{host.port ? `:${host.port}` : ''}
-                        </Typography>
-                    </Box>
-                    <Box>
-                        {host.online && (
-                            <Chip
-                                label="Online"
-                                color="success"
-                                size="small"
-                                icon={<PowerSettingsNewIcon />}
-                            />
-                        )}
-                        {!host.paired && (
-                            <Chip
-                                label="Not Paired"
-                                color="warning"
-                                size="small"
-                            />
-                        )}
-                    </Box>
+            <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        variant="dot"
+                        sx={{
+                            '& .MuiBadge-badge': {
+                                backgroundColor: statusColor,
+                                width: 12,
+                                height: 12,
+                                borderRadius: '50%',
+                                boxShadow: '0 0 0 2px white'
+                            }
+                        }}
+                    >
+                        <Avatar
+                            sx={{
+                                bgcolor: host.online ? 'primary.light' : 'grey.100',
+                                color: host.online ? 'primary.main' : 'grey.500',
+                                width: 56,
+                                height: 56
+                            }}
+                        >
+                            <ComputerIcon fontSize="large" />
+                        </Avatar>
+                    </Badge>
+
+                    <Chip
+                        label={pairedStatus ? "Paired" : "Unpaired"}
+                        size="small"
+                        icon={pairedStatus ? <LinkIcon /> : <LinkOffIcon />}
+                        color={pairedStatus ? "default" : "warning"}
+                        variant={pairedStatus ? "outlined" : "filled"}
+                        sx={{ fontWeight: 500 }}
+                    />
+                </Box>
+
+                <Box>
+                    <Typography variant="h6" fontWeight="bold" noWrap>
+                        {host.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                        {host.address}{host.port ? `:${host.port}` : ''}
+                    </Typography>
                 </Box>
             </CardContent>
 
-            <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Box>
-                    {host.paired ? (
-                        <Button
-                            size="small"
-                            variant="contained"
-                            onClick={(e) => { e.stopPropagation(); onConnect?.(host); }}
-                        >
-                            Connect
-                        </Button>
-                    ) : (
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            onClick={(e) => { e.stopPropagation(); onPair?.(host); }}
-                        >
-                            Pair
-                        </Button>
-                    )}
-                </Box>
+            <Divider light />
 
-                {isHovered && (
-                    <Box>
-                        <IconButton
-                            size="small"
-                            onClick={(e) => { e.stopPropagation(); onEdit?.(host); }}
-                            sx={{ mr: 1 }}
-                        >
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                            size="small"
-                            color="error"
-                            onClick={(e) => { e.stopPropagation(); onDelete?.(host); }}
-                        >
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
-                )}
-            </CardActions>
+            <Box sx={{
+                p: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+            }}>
+                <Button
+                    variant="contained"
+                    disableElevation
+                    color={pairedStatus ? "primary" : "secondary"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        pairedStatus ? onConnect?.(host) : onPair?.(host);
+                    }}
+                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                >
+                    {pairedStatus ? "Connect" : "Pair Device"}
+                </Button>
+            </Box>
         </Card>
     );
 }

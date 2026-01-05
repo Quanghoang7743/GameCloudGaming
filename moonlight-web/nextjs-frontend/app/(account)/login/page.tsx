@@ -49,7 +49,7 @@ export default function LoginPage() {
 
             // Redirect to home page after successful login
             setTimeout(() => {
-                router.push('/')
+                router.push('/gamestore')
             }, 1500)
 
         } catch (error: any) {

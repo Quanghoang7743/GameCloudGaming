@@ -9,8 +9,8 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/gamestore');
-    }, 2000);
+      router.push('/home');
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -28,7 +28,7 @@ export default function Home() {
         <CircularProgress sx={{ mb: 4 }} />
 
         <Typography color="text.secondary" paragraph>
-          Redirecting to login...
+          Loading...
         </Typography>
 
         <Button
