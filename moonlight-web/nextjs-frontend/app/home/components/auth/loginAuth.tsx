@@ -14,12 +14,11 @@ export default function LoginAuth() {
             <Button
                 sx={{
                     fontSize: "14px",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    color: "#fff",
-                    backgroundColor: "#19df54ff",
-                    padding: "5px 10px",
-                    border: '2px solid #fff'
+                    fontWeight: 500,
+                    color: "#000",
+                    background: 'linear-gradient(45deg, #F30FFF 0%, #A45DFF 51%, #32CEFF 100%)',
+                    padding: "5px 15px",
+                    borderRadius: "10px",
                 }}
                 onClick={handleLogin}
             >

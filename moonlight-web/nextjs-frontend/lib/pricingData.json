@@ -1,0 +1,29 @@
+[
+    {
+        "label": "Device Information",
+        "price": "10K/1H",
+        "CPU": "AMD Ryzen 5 4500",
+        "GPU": "AMD RX 5600",
+        "RAM": "16GB",
+        "Storage": "256GB",
+        "accentColor": ""
+    },
+    {
+        "label": "Device Information",
+        "price": "13K/1H",
+        "CPU": "I5 13400F",
+        "GPU": "RTX 3060Ti",
+        "RAM": "16GB",
+        "Storage": "256GB",
+        "accentColor": "#ef4444"
+    },
+    {
+        "label": "Device Information",
+        "price": "17K/1H",
+        "CPU": "I7 13700F",
+        "GPU": "RTX 4060Ti",
+        "RAM": "16GB",
+        "Storage": "256GB",
+        "accentColor": "#22c55e"
+    }
+]
