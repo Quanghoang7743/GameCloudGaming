@@ -1,13 +1,24 @@
 'use client'
+import { useAuth } from '@/app/context/AuthContext'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
 export default function LoginAuth() {
     const router = useRouter()
+    const { isAuthenticated } = useAuth()
 
     const handleLogin = () => {
-        router.push("/home")
+        if (isAuthenticated) {
+            router.push('/home')
+        } else {
+            const params = new URLSearchParams({
+                redirect_uri: '/home',
+                source: 'home_banner',
+                action: 'join'
+            });
+            router.push(`/login?${params.toString()}`);
+        }
     }
     return (
         <>

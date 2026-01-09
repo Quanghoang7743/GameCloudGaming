@@ -2,17 +2,23 @@
 import { Button, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { useAuth } from '@/app/context/AuthContext'
 
 export default function BtnJoin() {
     const router = useRouter()
-    const handleJoin = () => {
-        const params = new URLSearchParams({
-            redirect_uri: '/hosts',
-            source: 'home_banner',
-            action: 'join'
-        });
+    const { isAuthenticated } = useAuth()
 
-        router.push(`/login?${params.toString()}`);
+    const handleJoin = () => {
+        if (isAuthenticated) {
+            router.push('/hosts')
+        } else {
+            const params = new URLSearchParams({
+                redirect_uri: '/hosts',
+                source: 'home_banner',
+                action: 'join'
+            });
+            router.push(`/login?${params.toString()}`);
+        }
     }
     return (
         <Button

@@ -1,4 +1,5 @@
 'use client'
+import { useAuth } from '@/app/context/AuthContext'
 import { Button, keyframes, Typography } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -6,15 +7,24 @@ import React from 'react'
 
 
 export const GameCloud = () => {
+    const router = useRouter()
+    const { isAuthenticated } = useAuth()
     const pulseAnimation = keyframes`
       0% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.5); opacity: 0.7; }
       100% { transform: scale(1); opacity: 1; }
     `;
-
-    const router = useRouter()
     const handlePlayGame = () => {
-        router.push('/hosts')
+        if (isAuthenticated) {
+            router.push('/hosts')
+        } else {
+            const params = new URLSearchParams({
+                redirect_uri: '/hosts',
+                source: 'home_banner',
+                action: 'join'
+            });
+            router.push(`/login?${params.toString()}`);
+        }
     }
     return (
         <>

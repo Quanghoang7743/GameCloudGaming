@@ -1,3 +1,4 @@
+'use client'
 import useMenuSelectedStore, { USER_ACTIONS } from '@/app/zustand-store/menu-select-store'
 import { Box, Button, ClickAwayListener, Divider, Stack, Typography } from '@mui/material'
 import React from 'react'
@@ -6,9 +7,14 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import TollIcon from '@mui/icons-material/Toll';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function MenuWraper() {
     const menuState = useMenuSelectedStore()
+    const { logout } = useAuth()
+    const router = useRouter()
+
     const isOpenMenu = () => {
         return !!menuState.selected && menuState.action === USER_ACTIONS.SELECT_MENU
     }
@@ -16,6 +22,17 @@ export default function MenuWraper() {
     const handleCloseMenu = () => {
         menuState.clear()
     }
+
+    const handleSignOut = async () => {
+        try {
+            await logout()
+            handleCloseMenu()
+            window.location.href = '/home'
+        } catch (error) {
+            console.error('Sign out error:', error)
+        }
+    }
+
     if (!isOpenMenu()) {
         return null
     }
@@ -101,15 +118,17 @@ export default function MenuWraper() {
                 </Stack>
                 <Divider />
                 <Stack spacing={1} pt={1}>
-                    <Button sx={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        justifyContent: 'space-between',
-                        padding: '10px',
-                        borderRadius: '10px',
-                    }}>
+                    <Button
+                        onClick={handleSignOut}
+                        sx={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            justifyContent: 'space-between',
+                            padding: '10px',
+                            borderRadius: '10px',
+                        }}>
 
                         <Stack direction={"row"} gap={1} alignItems={"center"}>
                             <LogoutIcon sx={{ fontSize: "20px", color: "#fff" }} />

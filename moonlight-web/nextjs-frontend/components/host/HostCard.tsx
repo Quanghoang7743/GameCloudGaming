@@ -142,6 +142,25 @@ export function HostCard({ host, onConnect, onEdit, onDelete, onPair }: HostCard
                 >
                     {pairedStatus ? "Connect" : "Pair Device"}
                 </Button>
+
+                <Tooltip title="Delete host">
+                    <IconButton
+                        color="error"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete?.(host);
+                        }}
+                        sx={{
+                            '&:hover': {
+                                bgcolor: 'error.lighter',
+                                transform: 'scale(1.1)'
+                            },
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
         </Card>
     );

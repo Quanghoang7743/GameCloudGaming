@@ -2,17 +2,25 @@
 import { Button, Stack } from '@mui/material'
 import { useRouter } from 'next/navigation';
 import React from 'react'
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function PlayAndLearnUI() {
     const router = useRouter();
-    const handleGetStarted = () => {
-        const params = new URLSearchParams({
-            redirect_uri: '/hosts',
-            source: 'home_banner',
-            action: 'get_started'
-        });
+    const { isAuthenticated } = useAuth();
 
-        router.push(`/login?${params.toString()}`);
+    const handleGetStarted = () => {
+        // If user is already authenticated, go directly to hosts
+        if (isAuthenticated) {
+            router.push('/hosts');
+        } else {
+            // If not authenticated, redirect to login with redirect_uri
+            const params = new URLSearchParams({
+                redirect_uri: '/hosts',
+                source: 'home_banner',
+                action: 'get_started'
+            });
+            router.push(`/login?${params.toString()}`);
+        }
     }
 
     return (

@@ -1,12 +1,13 @@
 'use client'
 import { Alert, Box, Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { useAuth } from '@/app/context/AuthContext'
 
 export default function LoginPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { login } = useAuth()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -42,18 +43,17 @@ export default function LoginPage() {
         try {
             setLoading(true)
 
-            // Use login from AuthContext
             await login(username, password)
 
             setSuccess('Login successful! Redirecting...')
 
-            // Redirect to home page after successful login
+            const redirectUri = searchParams.get('redirect_uri') || '/home'
+
             setTimeout(() => {
-                router.push('/gamestore')
+                window.location.href = redirectUri
             }, 1500)
 
         } catch (error: any) {
-            // Handle different error scenarios
             let errorMessage = 'Login failed. Please try again.'
 
             if (error.response?.status === 401) {

@@ -184,16 +184,33 @@ async def refresh_token_endpoint(
 
 @router.post("/logout")
 async def logout(
-    refresh_token: str = Header(..., alias="X-Refresh-Token"),
+    response: Response,
+    request: Request,
     db: Session = Depends(get_db)
 ):
-    # Revoke refresh token
-    db_token = db.query(RefreshToken).filter(
-        RefreshToken.token == refresh_token
-    ).first()
+    # Get refresh token from cookies
+    refresh_token = request.cookies.get("refresh_token")
     
-    if db_token:
-        db_token.is_revoked = True
-        db.commit()
+    # Revoke refresh token if it exists
+    if refresh_token:
+        db_token = db.query(RefreshToken).filter(
+            RefreshToken.token == refresh_token
+        ).first()
+        
+        if db_token:
+            db_token.is_revoked = True
+            db.commit()
+    
+    # Clear cookies by setting them to expire immediately
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        samesite="lax"
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        path="/",
+        samesite="lax"
+    )
     
     return {"message": "Successfully logged out"}
