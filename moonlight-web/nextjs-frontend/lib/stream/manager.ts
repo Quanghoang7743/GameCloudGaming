@@ -10,6 +10,7 @@ import {
     andVideoCodecs,
     hasAnyCodec
 } from './types';
+import { TransportChannelId } from './constants';
 import { getStreamerSize, getVideoCodecHint, createPrettyList } from './utils';
 import { StreamInput } from './input';
 import type {
@@ -99,6 +100,10 @@ export class StreamManager {
         // Setup WebSocket
         this.logger.info('Initializing stream connection');
 
+        // Log WebSocket URL with masked token for debugging
+        const maskedUrl = this.config.wsUrl.replace(/token=[^&]+/, 'token=***');
+        this.logger.info(`Connecting to WebSocket: ${maskedUrl}`);
+
         this.ws = new WebSocket(this.config.wsUrl);
         this.ws.addEventListener('open', this.onWsOpen.bind(this));
         this.ws.addEventListener('close', this.onWsClose.bind(this));
@@ -129,15 +134,44 @@ export class StreamManager {
         this.wsSendBuffer = [];
     }
 
-    private onWsClose(): void {
-        this.logger.warn('WebSocket closed');
-        this.config.onError?.('Connection closed');
+    private onWsClose(event: CloseEvent): void {
+        const closeInfo = {
+            code: event.code,
+            reason: event.reason || 'No reason provided',
+            wasClean: event.wasClean
+        };
+
+        this.logger.warn(`WebSocket closed: ${JSON.stringify(closeInfo)}`);
+
+        let errorMessage = 'Connection closed';
+        if (!event.wasClean) {
+            errorMessage += ` unexpectedly (code: ${event.code})`;
+        }
+        if (event.reason) {
+            errorMessage += `: ${event.reason}`;
+        }
+
+        this.config.onError?.(errorMessage);
     }
 
     private onWsError(event: Event): void {
-        this.logger.error('WebSocket error');
-        console.error(event);
-        this.config.onError?.('WebSocket error');
+        const wsEvent = event as ErrorEvent;
+        const errorDetails = {
+            message: wsEvent.message || 'Unknown error',
+            filename: wsEvent.filename,
+            lineno: wsEvent.lineno,
+            colno: wsEvent.colno,
+            type: event.type,
+            target: (event.target as WebSocket)?.url ? 'WebSocket' : 'Unknown'
+        };
+
+        this.logger.error(`WebSocket error: ${JSON.stringify(errorDetails)}`);
+        console.error('[Stream] Full WebSocket error event:', event);
+
+        const errorMessage = wsEvent.message
+            ? `WebSocket connection error: ${wsEvent.message}`
+            : 'WebSocket connection failed';
+        this.config.onError?.(errorMessage);
     }
 
     private onWsMessage(event: MessageEvent): void {
@@ -306,7 +340,7 @@ export class StreamManager {
         }
 
         // Attach video track to element
-        const videoChannel = this.transport.getChannel(0); // HOST_VIDEO = 0
+        const videoChannel = this.transport.getChannel(TransportChannelId.HOST_VIDEO);
         if (videoChannel.type === 'videotrack') {
             videoChannel.onTrack = (track: MediaStreamTrack) => {
                 if (this.videoElement) {
@@ -334,7 +368,7 @@ export class StreamManager {
         this.transport.setupHostAudio({ type: ['audiotrack', 'data'] });
 
         // Attach audio track to element
-        const audioChannel = this.transport.getChannel(1); // HOST_AUDIO = 1
+        const audioChannel = this.transport.getChannel(TransportChannelId.HOST_AUDIO);
         if (audioChannel.type === 'audiotrack') {
             audioChannel.onTrack = (track: MediaStreamTrack) => {
                 // Create audio element if needed

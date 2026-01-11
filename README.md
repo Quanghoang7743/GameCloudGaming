@@ -94,16 +94,16 @@ graph TB
 <!-- Placeholder cho hình ảnh - sẽ được thêm vào sau -->
 
 ### Giao diện đăng nhập
-![Đăng nhập - Chờ thêm ảnh]()
+
 
 ### Danh sách Host
-![Danh sách Host - Chờ thêm ảnh]()
+
 
 ### Danh sách Game
-![Danh sách Game - Chờ thêm ảnh]()
+
 
 ### Màn hình Streaming
-![Streaming Game - Chờ thêm ảnh]()
+
 
 ## Công nghệ sử dụng
 
@@ -210,10 +210,5 @@ cargo build --release
 
 GPL-3.0-or-later
 
-## Đóng góp
-
-Dự án dựa trên [Moonlight Web Stream](https://github.com/MrCreativ3001/moonlight-web-stream) với các tùy chỉnh và mở rộng cho Game Cloud Gaming platform.
-
 ---
 
-**Lưu ý**: Đây là project demo/portfolio. Để sử dụng trong môi trường production, cần bổ sung thêm các biện pháp bảo mật và tối ưu hóa.

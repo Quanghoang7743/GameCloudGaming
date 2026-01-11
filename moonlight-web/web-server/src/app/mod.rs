@@ -306,6 +306,18 @@ impl App {
 
                 user.authenticate(&auth).await
             }
+            UserAuth::QueryToken { ref token } => {
+                // Verify token with Python backend first
+                let username = crate::api::auth::verify_python_token(token).await
+                    .map_err(|e| {
+                        eprintln!("[WebSocket Auth] Token verification failed: {:?}", e);
+                        AppError::Unauthorized
+                    })?;
+                
+                // Find user by verified username
+                let user = self.user_by_name(&username).await?;
+                user.authenticate(&auth).await
+            }
         }
     }
 

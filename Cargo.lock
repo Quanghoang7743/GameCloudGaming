@@ -3901,6 +3901,7 @@ dependencies = [
  "moonlight-common",
  "openssl",
  "pem",
+ "reqwest",
  "serde",
  "serde_json",
  "simplelog",

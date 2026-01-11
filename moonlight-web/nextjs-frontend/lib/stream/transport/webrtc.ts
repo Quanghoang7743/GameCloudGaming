@@ -4,11 +4,11 @@
 import {
     Transport,
     TransportChannel,
-    TransportChannelId,
     VideoCodecSupport,
     emptyVideoCodecs,
     Logger
 } from '../types';
+import { TransportChannelId } from '../constants';
 import type { StreamSignalingMessage } from '@/lib/api/types';
 
 export class WebRTCTransport implements Transport {
@@ -72,17 +72,62 @@ export class WebRTCTransport implements Transport {
     private initChannels(): void {
         if (!this.peer) return;
 
-        // Create data channels for input
-        const inputChannel = this.peer.createDataChannel('client_input', {
+        // Create keyboard channel
+        const keyboardChannel = this.peer.createDataChannel('keyboard', {
             ordered: false,
             maxRetransmits: 0
         });
 
-        this.channels.set(TransportChannelId.CLIENT_INPUT, {
+        this.channels.set(TransportChannelId.KEYBOARD, {
             type: 'data',
             send: (data: ArrayBuffer) => {
-                if (inputChannel.readyState === 'open') {
-                    inputChannel.send(data);
+                if (keyboardChannel.readyState === 'open') {
+                    keyboardChannel.send(data);
+                }
+            }
+        });
+
+        // Create mouse reliable channel
+        const mouseReliableChannel = this.peer.createDataChannel('mouse_reliable', {
+            ordered: true
+        });
+
+        this.channels.set(TransportChannelId.MOUSE_RELIABLE, {
+            type: 'data',
+            send: (data: ArrayBuffer) => {
+                if (mouseReliableChannel.readyState === 'open') {
+                    mouseReliableChannel.send(data);
+                }
+            }
+        });
+
+        // Create mouse absolute channel
+        const mouseAbsoluteChannel = this.peer.createDataChannel('mouse_absolute', {
+            ordered: false,
+            maxRetransmits: 0
+        });
+
+        this.channels.set(TransportChannelId.MOUSE_ABSOLUTE, {
+            type: 'data',
+            send: (data: ArrayBuffer) => {
+                if (mouseAbsoluteChannel.readyState === 'open') {
+                    mouseAbsoluteChannel.send(data);
+                }
+            },
+            estimatedBufferedBytes: () => mouseAbsoluteChannel.bufferedAmount
+        });
+
+        // Create mouse relative channel
+        const mouseRelativeChannel = this.peer.createDataChannel('mouse_relative', {
+            ordered: false,
+            maxRetransmits: 0
+        });
+
+        this.channels.set(TransportChannelId.MOUSE_RELATIVE, {
+            type: 'data',
+            send: (data: ArrayBuffer) => {
+                if (mouseRelativeChannel.readyState === 'open') {
+                    mouseRelativeChannel.send(data);
                 }
             }
         });
@@ -125,7 +170,9 @@ export class WebRTCTransport implements Transport {
         if (event.candidate) {
             const candidate = event.candidate.toJSON();
 
-            this.logger?.debug(`Sending ICE candidate`);
+            // Detailed logging for debugging
+            this.logger?.debug(`[ICE] New candidate: type=${event.candidate.type}, protocol=${event.candidate.protocol}, address=${event.candidate.address || 'unknown'}`);
+            this.logger?.debug(`[ICE] Candidate string: ${candidate.candidate}`);
 
             this.onsendmessage?.({
                 WebRtc: {
@@ -137,6 +184,8 @@ export class WebRTCTransport implements Transport {
                     }
                 }
             });
+        } else {
+            this.logger?.debug('[ICE] All local candidates gathered (end-of-candidates)');
         }
     }
 
@@ -192,7 +241,19 @@ export class WebRTCTransport implements Transport {
 
     private onIceConnectionStateChange(): void {
         if (!this.peer) return;
-        this.logger?.debug(`ICE connection state: ${this.peer.iceConnectionState}`);
+
+        const iceState = this.peer.iceConnectionState;
+        const gatheringState = this.peer.iceGatheringState;
+
+        this.logger?.info(`[ICE] Connection state: ${iceState}, Gathering state: ${gatheringState}`);
+
+        if (iceState === 'failed') {
+            this.logger?.error('[ICE] Connection failed - check firewall, STUN servers, or network');
+        } else if (iceState === 'disconnected') {
+            this.logger?.warn('[ICE] Connection disconnected - may recover automatically');
+        } else if (iceState === 'connected') {
+            this.logger?.info('[ICE] Connection established successfully!');
+        }
     }
 
     /**

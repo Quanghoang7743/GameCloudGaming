@@ -25,7 +25,7 @@ export function StreamViewer({ videoRef, onVideoClick }: StreamViewerProps) {
                 position: 'relative',
                 width: '100vw',
                 height: '100vh',
-                bgcolor: 'black',
+                // bgcolor: 'black',
                 overflow: 'hidden',
             }}
             onClick={onVideoClick}

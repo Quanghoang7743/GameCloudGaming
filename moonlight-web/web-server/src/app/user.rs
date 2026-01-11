@@ -177,6 +177,21 @@ impl User {
                     Err(AppError::Forbidden)
                 }
             }
+            UserAuth::QueryToken { token } => {
+                // Verify JWT token with Python backend
+                let username = crate::api::auth::verify_python_token(token).await
+                    .map_err(|e| {
+                        eprintln!("[WebSocket Auth] Token verification failed: {:?}", e);
+                        AppError::Unauthorized
+                    })?;
+                
+                let storage = self.storage_user().await?;
+                if storage.name.as_str() == username.as_str() {
+                    Ok(AuthenticatedUser { inner: self })
+                } else {
+                    Err(AppError::Forbidden)
+                }
+            }
             _ => Err(AppError::Unauthorized),
         }
     }

@@ -60,8 +60,15 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    # Read token from cookie instead of Authorization header
-    token = request.cookies.get("access_token")
+    # Try to get token from Authorization header first (for WebSocket/API calls)
+    token = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "").strip()
+    
+    # If not in header, try cookie (for regular web requests)
+    if not token:
+        token = request.cookies.get("access_token")
     
     if not token:
         raise credentials_exception

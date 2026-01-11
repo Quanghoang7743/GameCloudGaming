@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  coturn:
+    image: coturn/coturn:latest
+    container_name: turn-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf
+    environment:
+      - DETECT_EXTERNAL_IP=yes

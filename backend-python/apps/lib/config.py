@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     # JWT Settings
     SECRET_KEY: str = secrets.token_urlsafe(32)  # Auto-generate if not provided
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # Short-lived for security
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # Short-lived for security
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7  # Long-lived for seamless UX
 
     class Config:

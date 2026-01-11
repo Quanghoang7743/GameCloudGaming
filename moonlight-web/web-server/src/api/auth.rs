@@ -36,23 +36,15 @@ fn extract_user_auth(req: &HttpRequest) -> Result<UserAuth, AppError> {
     };
 
     // First, check for query parameter token (for WebSocket auth)
+    // We'll extract the token here and verify it later in AuthenticatedUser::from_request
     if let Some(query_str) = req.uri().query() {
         for param in query_str.split('&') {
             if let Some((key, value)) = param.split_once('=') {
                 if key == "token" {
-                    // Got token from query param - verify with Python backend
-                    // Use tokio block_in_place since this is in sync context
-                    match tokio::task::block_in_place(|| {
-                        tokio::runtime::Handle::current().block_on(verify_python_token(value))
-                    }) {
-                        Ok(username) => {
-                            return Ok(UserAuth::ForwardedHeaders { username });
-                        }
-                        Err(e) => {
-                            eprintln!("[WebSocket Auth] Token verification failed: {:?}", e);
-                            return Err(AppError::Unauthorized);
-                        }
-                    }
+                    // Return the token as a string to be verified later
+                    return Ok(UserAuth::QueryToken {
+                        token: value.to_string(),
+                    });
                 }
             }
         }
@@ -93,11 +85,11 @@ fn extract_user_auth(req: &HttpRequest) -> Result<UserAuth, AppError> {
 }
 
 // Verify JWT token with Python backend and extract username
-async fn verify_python_token(token: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn verify_python_token(token: &str) -> Result<String, Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     let response = client
         .get("http://localhost:8001/auth/me")
-        .header("Cookie", format!("access_token={}", token))
+        .header("Authorization", format!("Bearer {}", token))
         .send()
         .await?;
 

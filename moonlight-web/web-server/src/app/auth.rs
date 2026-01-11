@@ -14,6 +14,7 @@ pub enum UserAuth {
     UserPassword { username: String, password: String },
     Session(SessionToken),
     ForwardedHeaders { username: String },
+    QueryToken { token: String },
 }
 
 const SESSION_TOKEN_SIZE: usize = 32;

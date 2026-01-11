@@ -43,7 +43,7 @@ export default function StreamPage() {
         let pollCount = 0;
         const checkVideo = () => {
             pollCount++;
-            console.log(`[StreamPage] Poll #${pollCount}: videoRef.current =`, videoRef.current);
+            // console.log(`[StreamPage] Poll #${pollCount}: videoRef.current =`, videoRef.current);
             if (videoRef.current && !videoMounted) {
                 console.log('[StreamPage] Video element detected!');
                 setVideoMounted(true);
@@ -103,15 +103,18 @@ export default function StreamPage() {
                 .find(row => row.startsWith('access_token='))
                 ?.split('=')[1];
 
+            console.log('[StreamPage] Access token:', accessToken ? 'PRESENT' : 'MISSING');
+
             if (!accessToken) {
                 console.error('[StreamPage] No access token found in cookies!');
+                console.log('[StreamPage] Available cookies:', document.cookie.split('; ').map(c => c.split('=')[0]).join(', '));
                 setError('Authentication required');
                 setLoading(false);
                 return;
             }
 
-            const wsUrl = `${wsProtocol}//${wsHost}/host/stream?token=${accessToken}`;
-            console.log('[StreamPage] WebSocket URL constructed (token included)');
+            const wsUrl = `${wsProtocol}//${wsHost}/api/host/stream?token=${accessToken}`;
+            console.log('[StreamPage] WebSocket URL constructed:', wsUrl.replace(/token=[^&]+/, 'token=***'));
 
             // Create stream manager
             const manager = new StreamManager({
